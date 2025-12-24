@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "登录 - 单词持久战",
+  "usingComponents": {
+    "wd-button": "../../node-modules/wot-design-uni/components/wd-button/wd-button"
+  }
+}

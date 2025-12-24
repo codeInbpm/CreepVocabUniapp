@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "登录 - 单词天天斗",
+  "usingComponents": {
+    "wd-button": "../../node-modules/wot-design-uni/components/wd-button/wd-button"
+  }
+}

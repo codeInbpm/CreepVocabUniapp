@@ -1,0 +1,205 @@
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.home-container.data-v-0cd09a48 {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #E0F2FF 0%, #FFFFFF 100%);
+  padding: 20rpx;
+  box-sizing: border-box;
+}
+.header.data-v-0cd09a48 {
+  padding-top: 40rpx;
+  margin-bottom: 40rpx;
+}
+.header .user-card.data-v-0cd09a48 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40rpx;
+  position: relative;
+}
+.header .user-card .avatar.data-v-0cd09a48 {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  border: 4rpx solid #fff;
+}
+.header .user-card .info .name.data-v-0cd09a48 {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+.header .user-card .info .stats.data-v-0cd09a48 {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6rpx;
+}
+.header .user-card .info .stats .stat-item.data-v-0cd09a48 {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+  margin-right: 20rpx;
+}
+.header .user-card .info .stats .stat-item text.data-v-0cd09a48 {
+  margin-left: 4rpx;
+}
+.header .user-card .info .stats-sub.data-v-0cd09a48 {
+  font-size: 20rpx;
+  color: #999;
+}
+.header .user-card .info .stats-sub .ml.data-v-0cd09a48 {
+  margin-left: 20rpx;
+}
+.header .user-card .weather-icon.data-v-0cd09a48 {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.header .tools-row.data-v-0cd09a48 {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 20rpx;
+  padding: 20rpx;
+}
+.header .tools-row .tool-item.data-v-0cd09a48 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.header .tools-row .tool-item .label.data-v-0cd09a48 {
+  font-size: 24rpx;
+  color: #666;
+  margin: 6rpx 0;
+}
+.header .tools-row .tool-item .value.data-v-0cd09a48 {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+.header .tools-row .divider.data-v-0cd09a48 {
+  width: 2rpx;
+  height: 60rpx;
+  background: #ddd;
+}
+.main-content .action-card.data-v-0cd09a48 {
+  height: 160rpx;
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 40rpx;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+.main-content .action-card .content-left.data-v-0cd09a48 {
+  display: flex;
+  align-items: center;
+}
+.main-content .action-card .content-left .text-group.data-v-0cd09a48 {
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+}
+.main-content .action-card .content-left .text-group .title.data-v-0cd09a48 {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+.main-content .action-card .content-left .text-group .subtitle.data-v-0cd09a48 {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+.main-content .action-card .tag.data-v-0cd09a48 {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+  background: #FF4D4F;
+  color: #fff;
+  padding: 4rpx 12rpx;
+  font-size: 20rpx;
+  border-radius: 8rpx;
+}
+.main-content .random-match.data-v-0cd09a48 {
+  background: linear-gradient(135deg, #81D4FA 0%, #4FC3F7 100%);
+}
+.main-content .friend-match.data-v-0cd09a48 {
+  background: linear-gradient(135deg, #FFAB91 0%, #FF8A65 100%);
+}
+.main-content .bottom-row.data-v-0cd09a48 {
+  display: flex;
+  justify-content: space-between;
+}
+.main-content .bottom-row .small-card.data-v-0cd09a48 {
+  width: 48%;
+  height: 200rpx;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  box-sizing: border-box;
+  position: relative;
+}
+.main-content .bottom-row .small-card .title.data-v-0cd09a48 {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+}
+.main-content .bottom-row .small-card .subtitle.data-v-0cd09a48 {
+  font-size: 20rpx;
+  color: #fff;
+  opacity: 0.9;
+}
+.main-content .bottom-row .small-card.challenge.data-v-0cd09a48 {
+  background: linear-gradient(135deg, #9575CD 0%, #7986CB 100%);
+}
+.main-content .bottom-row .small-card.challenge .mascot.data-v-0cd09a48 {
+  width: 80rpx;
+  position: absolute;
+  bottom: 10rpx;
+  right: 10rpx;
+}
+.main-content .bottom-row .small-card.review.data-v-0cd09a48 {
+  background: linear-gradient(135deg, #4DB6AC 0%, #26A69A 100%);
+}
+.main-content .bottom-row .small-card.review .icon.data-v-0cd09a48 {
+  position: absolute;
+  bottom: 10rpx;
+  right: 10rpx;
+}
+.footer.data-v-0cd09a48 {
+  margin-top: 60rpx;
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 40rpx;
+}
+.footer .link-item.data-v-0cd09a48 {
+  display: flex;
+  align-items: center;
+  font-size: 24rpx;
+  color: #666;
+}
+.footer .link-item text.data-v-0cd09a48 {
+  margin-left: 8rpx;
+}

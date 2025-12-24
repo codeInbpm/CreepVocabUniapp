@@ -1,0 +1,61 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/home/home",
+    "pages/battle/battle",
+    "pages/match/match",
+    "pages/result/result",
+    "pages/profile/profile",
+    "pages/wordbook/wordbook",
+    "pages/wrongbook/wrongbook",
+    "pages/rank/rank",
+    "pages/battle/friend-match",
+    "pages/study/study",
+    "pages/community/community"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "CreepVocab",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4D80F0",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "对战",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home_active.png"
+      },
+      {
+        "pagePath": "pages/study/study",
+        "text": "学习",
+        "iconPath": "static/tabbar/study.png",
+        "selectedIconPath": "static/tabbar/study_active.png"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社区",
+        "iconPath": "static/tabbar/community.png",
+        "selectedIconPath": "static/tabbar/community_active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "static/tabbar/profile.png",
+        "selectedIconPath": "static/tabbar/profile_active.png"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "connectSocket": 10000,
+    "uploadFile": 10000,
+    "downloadFile": 10000
+  },
+  "usingComponents": {}
+}

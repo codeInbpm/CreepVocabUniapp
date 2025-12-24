@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/home/home",
+    "pages/battle/battle",
+    "pages/match/match",
+    "pages/result/result",
+    "pages/profile/profile",
+    "pages/wordbook/wordbook",
+    "pages/wrongbook/wrongbook",
+    "pages/rank/rank"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "单词天天斗",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "usingComponents": {}
+}

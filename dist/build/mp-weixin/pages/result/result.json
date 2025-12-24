@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "对战结算",
+  "usingComponents": {
+    "wd-button": "../../node-modules/wot-design-uni/components/wd-button/wd-button"
+  }
+}

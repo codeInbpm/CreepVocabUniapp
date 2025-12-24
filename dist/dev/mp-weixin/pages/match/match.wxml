@@ -1,0 +1,1 @@
+<view class="match-container data-v-51dcac06"><view class="loading data-v-51dcac06"><view class="spinner data-v-51dcac06"></view><text class="status data-v-51dcac06">{{a}}</text></view><button class="cancel-btn data-v-51dcac06" bindtap="{{b}}">取消匹配</button></view>
