@@ -22,13 +22,13 @@
                 <wd-icon name="loading" size="24px" color="#F4A261" />
             </view>
         </view>
-        
+
         <!-- Tools Row -->
         <view class="tools-row">
-            <view class="tool-item">
+            <view class="tool-item" @click="openHintPopup">
                 <wd-icon name="tips" size="28px" color="#333" />
                 <view class="label">提示卡</view>
-                <view class="value">999</view>
+                <view class="value">{{ userStore.userInfo.hintCards || 0 }}</view>
             </view>
             <view class="divider"></view>
             <view class="tool-item" @click="toWordBook">
@@ -52,7 +52,7 @@
             </view>
             <view class="tag">HOT</view>
         </view>
-        
+
         <!-- Friend Match -->
         <view class="action-card friend-match" @click="toFriendMatch">
             <view class="content-left">
@@ -63,7 +63,7 @@
                 </view>
             </view>
         </view>
-        
+
         <!-- Bottom Row -->
         <view class="bottom-row">
             <view class="small-card challenge" @click="toChallenge">
@@ -78,7 +78,7 @@
             </view>
         </view>
     </view>
-    
+
     <!-- Footer Links -->
     <view class="footer">
         <view class="link-item" @click="toRank">
@@ -94,13 +94,78 @@
             <text>打赏作者</text>
         </view>
     </view>
-  </view>
+    </view>
+
+    <!-- Hint Card Popup -->
+    <wd-popup v-model="showHintPopup" position="center" custom-style="border-radius: 24rpx; width: 600rpx;">
+        <view class="hint-popup">
+            <image class="hamster" src="/static/logo.png" mode="widthFix" />
+            <view class="text-content">
+                <view class="highlight">提示卡<text class="normal">可在对战时给你提示</text></view>
+                <view class="normal">单词释义哦！对战结束分享</view>
+                <view class="normal">对战结果至群，可以获得更</view>
+                <view class="normal">多提示卡~ 感谢伙伴们支持~</view>
+            </view>
+            <view class="action-btn" @click="handleWatchAd">
+                点我看个15s之内视频，获取20提示卡~
+            </view>
+            <view class="close-btn" @click="showHintPopup = false">
+                <wd-icon name="close-circle" size="32px" color="#fff" />
+            </view>
+        </view>
+    </wd-popup>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
+import { rewardHintCards, getUserProfile } from '@/api/user'
 
 const userStore = useUserStore()
+const showHintPopup = ref(false)
+
+onShow(() => {
+  // 如果有 token 但 userInfo 为空或不完整，才刷新
+  if (userStore.token && (!userStore.userInfo || !userStore.userInfo.nickname)) {
+    getUserProfile().then(res => {
+      userStore.saveUserInfo(res)
+    }).catch(err => {
+      console.error('刷新用户信息失败', err)
+      // 可选：如果失败，清理 token 强制重新登录
+      // userStore.clear()
+      // uni.navigateTo({ url: '/pages/login/login' })
+    })
+  }
+})
+
+const openHintPopup = () => {
+    showHintPopup.value = true
+}
+
+const handleWatchAd = () => {
+    uni.showLoading({ title: '视频加载中...' })
+    // Simulate Ad watching
+    setTimeout(() => {
+        uni.hideLoading()
+        uni.showModal({
+            title: '观看完整',
+            content: '是否领取奖励？',
+            success: (res) => {
+                if (res.confirm) {
+                    rewardHintCards().then(newCount => {
+                        uni.showToast({ title: '获得20张提示卡！', icon: 'success' })
+                        // Update store
+                        const info = { ...userStore.userInfo }
+                        info.hintCards = newCount
+                        userStore.saveUserInfo(info)
+                        showHintPopup.value = false
+                    })
+                }
+            }
+        })
+    }, 1000)
+}
 
 const toMatch = () => uni.navigateTo({ url: '/pages/match/match' })
 const toFriendMatch = () => uni.navigateTo({ url: '/pages/battle/friend-match' })
@@ -122,13 +187,13 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
 .header {
     padding-top: 40rpx;
     margin-bottom: 40rpx;
-    
+
     .user-card {
         display: flex;
         align-items: center;
         margin-bottom: 40rpx;
         position: relative;
-        
+
         .avatar {
             width: 100rpx;
             height: 100rpx;
@@ -136,7 +201,7 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
             margin-right: 20rpx;
             border: 4rpx solid #fff;
         }
-        
+
         .info {
             .name {
                 font-size: 32rpx;
@@ -162,14 +227,14 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
                 .ml { margin-left: 20rpx; }
             }
         }
-        
+
         .weather-icon {
             position: absolute;
             right: 0;
             top: 0;
         }
     }
-    
+
     .tools-row {
         display: flex;
         justify-content: space-around;
@@ -177,7 +242,7 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
         background: rgba(255,255,255,0.6);
         border-radius: 20rpx;
         padding: 20rpx;
-        
+
         .tool-item {
             display: flex;
             flex-direction: column;
@@ -204,7 +269,7 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
         position: relative;
         color: #fff;
         box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.1);
-        
+
         .content-left {
             display: flex;
             align-items: center;
@@ -216,7 +281,7 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
                 .subtitle { font-size: 24rpx; opacity: 0.8; }
             }
         }
-        
+
         .tag {
             position: absolute;
             top: 20rpx;
@@ -228,18 +293,18 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
             border-radius: 8rpx;
         }
     }
-    
+
     .random-match {
         background: linear-gradient(135deg, #81D4FA 0%, #4FC3F7 100%);
     }
     .friend-match {
         background: linear-gradient(135deg, #FFAB91 0%, #FF8A65 100%);
     }
-    
+
     .bottom-row {
         display: flex;
         justify-content: space-between;
-        
+
         .small-card {
             width: 48%;
             height: 200rpx;
@@ -247,10 +312,10 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
             padding: 20rpx;
             box-sizing: border-box;
             position: relative;
-            
+
             .title { font-size: 32rpx; font-weight: bold; color: #fff; }
             .subtitle { font-size: 20rpx; color: #fff; opacity: 0.9; }
-            
+
             &.challenge {
                 background: linear-gradient(135deg, #9575CD 0%, #7986CB 100%);
                 .mascot { width: 80rpx; position: absolute; bottom: 10rpx; right: 10rpx; }
@@ -268,13 +333,58 @@ const toProfile = () => uni.switchTab({ url: '/pages/profile/profile' })
     display: flex;
     justify-content: space-around;
     padding-bottom: 40rpx;
-    
+
     .link-item {
         display: flex;
         align-items: center;
         font-size: 24rpx;
         color: #666;
         text { margin-left: 8rpx; }
+    }
+}
+
+.hint-popup {
+    background: #fff;
+    padding: 40rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-radius: 24rpx;
+
+    .hamster {
+        width: 120rpx;
+        margin-bottom: 30rpx;
+    }
+
+    .text-content {
+        font-size: 28rpx;
+        color: #333;
+        text-align: center;
+        line-height: 1.6;
+        margin-bottom: 40rpx;
+        .highlight {
+            font-weight: bold;
+            color: #FF9800;
+        }
+        .normal {
+            color: #666;
+            font-weight: normal;
+        }
+    }
+
+    .action-btn {
+        font-size: 24rpx;
+        color: #FF9800;
+        padding: 20rpx 0;
+        cursor: pointer;
+    }
+
+    .close-btn {
+        position: absolute;
+        bottom: -100rpx;
+        left: 50%;
+        transform: translateX(-50%);
     }
 }
 </style>

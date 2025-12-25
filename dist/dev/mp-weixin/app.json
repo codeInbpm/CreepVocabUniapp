@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/login",
+    "pages/login/bind-phone",
     "pages/home/home",
     "pages/battle/battle",
     "pages/match/match",

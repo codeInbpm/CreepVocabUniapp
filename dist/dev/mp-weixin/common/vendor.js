@@ -39,7 +39,7 @@ const isFunction$1 = (val) => typeof val === "function";
 const isString$1 = (val) => typeof val === "string";
 const isSymbol = (val) => typeof val === "symbol";
 const isObject = (val) => val !== null && typeof val === "object";
-const isPromise = (val) => {
+const isPromise$1 = (val) => {
   return (isObject(val) || isFunction$1(val)) && isFunction$1(val.then) && isFunction$1(val.catch);
 };
 const objectToString = Object.prototype.toString;
@@ -672,7 +672,7 @@ function queue$1(hooks, data, params) {
       promise = Promise.resolve(wrapperHook(hook, params));
     } else {
       const res = hook(data, params);
-      if (isPromise(res)) {
+      if (isPromise$1(res)) {
         promise = Promise.resolve(res);
       }
       if (res === false) {
@@ -3028,7 +3028,7 @@ function callWithErrorHandling(fn, instance, type, args) {
 function callWithAsyncErrorHandling(fn, instance, type, args) {
   if (isFunction$1(fn)) {
     const res = callWithErrorHandling(fn, instance, type, args);
-    if (res && isPromise(res)) {
+    if (res && isPromise$1(res)) {
       res.catch((err) => {
         handleError(err, instance, type);
       });
@@ -4389,7 +4389,7 @@ function applyOptions$1(instance) {
       );
     }
     const data = dataOptions.call(publicThis, publicThis);
-    if (isPromise(data)) {
+    if (isPromise$1(data)) {
       warn$1(
         `data() returned a Promise - note data() cannot be async; If you intend to perform data fetching before component renders, use async setup() + <Suspense>.`
       );
@@ -5370,7 +5370,7 @@ function setupStatefulComponent(instance, isSSR) {
     );
     resetTracking();
     reset();
-    if (isPromise(setupResult)) {
+    if (isPromise$1(setupResult)) {
       setupResult.then(unsetCurrentInstance, unsetCurrentInstance);
       {
         warn$1(
@@ -6517,7 +6517,7 @@ function createInvoker(initialValue, instance) {
       setTimeout(invoke);
     } else {
       const res = invoke();
-      if (e2.type === "input" && (isArray$1(res) || isPromise(res))) {
+      if (e2.type === "input" && (isArray$1(res) || isPromise$1(res))) {
         return;
       }
       return res;
@@ -8099,6 +8099,10 @@ const makeBooleanProp = (defaultVal) => ({
   type: Boolean,
   default: defaultVal
 });
+const makeNumberProp = (defaultVal) => ({
+  type: Number,
+  default: defaultVal
+});
 const makeStringProp = (defaultVal) => ({
   type: String,
   default: defaultVal
@@ -8205,6 +8209,27 @@ const buttonProps = {
    */
   scope: String
 };
+class AbortablePromise {
+  constructor(executor) {
+    this._reject = null;
+    this.promise = new Promise((resolve2, reject) => {
+      executor(resolve2, reject);
+      this._reject = reject;
+    });
+  }
+  // 提供abort方法来中止Promise
+  abort(error) {
+    if (this._reject) {
+      this._reject(error);
+    }
+  }
+  then(onfulfilled, onrejected) {
+    return this.promise.then(onfulfilled, onrejected);
+  }
+  catch(onrejected) {
+    return this.promise.catch(onrejected);
+  }
+}
 function addUnit(num) {
   return Number.isNaN(Number(num)) ? `${num}` : `${num}px`;
 }
@@ -8236,6 +8261,12 @@ function isFunction(value) {
 function isString(value) {
   return getType(value) === "string";
 }
+function isPromise(value) {
+  if (isObj(value) && isDef(value)) {
+    return isFunction(value.then) && isFunction(value.catch);
+  }
+  return false;
+}
 function objToStyle(styles) {
   if (isArray(styles)) {
     const result = styles.filter(function(item) {
@@ -8258,6 +8289,14 @@ function objToStyle(styles) {
   }
   return "";
 }
+const pause = (ms = 1e3 / 30) => {
+  return new AbortablePromise((resolve2) => {
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      resolve2(true);
+    }, ms);
+  });
+};
 const iconProps = {
   ...baseProps,
   /**
@@ -8276,6 +8315,95 @@ const iconProps = {
    * 类名前缀，用于使用自定义图标
    */
   classPrefix: makeStringProp("wd-icon")
+};
+const popupProps = {
+  ...baseProps,
+  /**
+   * 动画类型，参见 wd-transition 组件的name
+   * 类型：string
+   * 可选值：fade / fade-up / fade-down / fade-left / fade-right / slide-up / slide-down / slide-left / slide-right / zoom-in
+   */
+  transition: String,
+  /**
+   * 关闭按钮
+   * 类型：boolean
+   * 默认值：false
+   */
+  closable: makeBooleanProp(false),
+  /**
+   * 弹出框的位置
+   * 类型：string
+   * 默认值：center
+   * 可选值：center / top / right / bottom / left
+   */
+  position: makeStringProp("center"),
+  /**
+   * 点击遮罩是否关闭
+   * 类型：boolean
+   * 默认值：true
+   */
+  closeOnClickModal: makeBooleanProp(true),
+  /**
+   * 动画持续时间
+   * 类型：number | boolean
+   * 默认值：300
+   */
+  duration: {
+    type: [Number, Boolean],
+    default: 300
+  },
+  /**
+   * 是否显示遮罩
+   * 类型：boolean
+   * 默认值：true
+   */
+  modal: makeBooleanProp(true),
+  /**
+   * 设置层级
+   * 类型：number
+   * 默认值：10
+   */
+  zIndex: makeNumberProp(10),
+  /**
+   * 是否当关闭时将弹出层隐藏（display: none)
+   * 类型：boolean
+   * 默认值：true
+   */
+  hideWhenClose: makeBooleanProp(true),
+  /**
+   * 遮罩样式
+   * 类型：string
+   * 默认值：''
+   */
+  modalStyle: makeStringProp(""),
+  /**
+   * 弹出面板是否设置底部安全距离（iphone X 类型的机型）
+   * 类型：boolean
+   * 默认值：false
+   */
+  safeAreaInsetBottom: makeBooleanProp(false),
+  /**
+   * 弹出层是否显示
+   */
+  modelValue: makeBooleanProp(false),
+  /**
+   * 弹层内容懒渲染，触发展示时才渲染内容
+   * 类型：boolean
+   * 默认值：true
+   */
+  lazyRender: makeBooleanProp(true),
+  /**
+   * 是否锁定滚动
+   * 类型：boolean
+   * 默认值：true
+   */
+  lockScroll: makeBooleanProp(true),
+  /**
+   * 是否从页面中脱离出来，用于解决各种 fixed 失效问题 (H5: teleport, APP: renderjs, 小程序: root-portal)
+   * 类型：boolean
+   * 默认值：false
+   */
+  rootPortal: makeBooleanProp(false)
 };
 const switchProps = {
   ...baseProps,
@@ -8324,6 +8452,102 @@ const switchProps = {
    */
   beforeChange: Function
 };
+const overlayProps = {
+  ...baseProps,
+  /**
+   * 是否展示遮罩层
+   */
+  show: makeBooleanProp(false),
+  /**
+   * 动画时长，单位毫秒
+   */
+  duration: {
+    type: [Object, Number, Boolean],
+    default: 300
+  },
+  /**
+   * 是否锁定滚动
+   */
+  lockScroll: makeBooleanProp(true),
+  /**
+   * 层级
+   */
+  zIndex: makeNumberProp(10)
+};
+const transitionProps = {
+  ...baseProps,
+  /**
+   * 是否展示组件
+   * 类型：boolean
+   * 默认值：false
+   */
+  show: makeBooleanProp(false),
+  /**
+   * 动画执行时间
+   * 类型：number | boolean | Record<string, number>
+   * 默认值：300 (毫秒)
+   */
+  duration: {
+    type: [Object, Number, Boolean],
+    default: 300
+  },
+  /**
+   * 弹层内容懒渲染，触发展示时才渲染内容
+   * 类型：boolean
+   * 默认值：false
+   */
+  lazyRender: makeBooleanProp(false),
+  /**
+   * 动画类型
+   * 类型：string
+   * 可选值：fade / fade-up / fade-down / fade-left / fade-right / slide-up / slide-down / slide-left / slide-right / zoom-in
+   * 默认值：'fade'
+   */
+  name: [String, Array],
+  /**
+   * 是否在动画结束时销毁子节点（display: none)
+   * 类型：boolean
+   * 默认值：false
+   */
+  destroy: makeBooleanProp(true),
+  /**
+   * 进入过渡的开始状态
+   * 类型：string
+   */
+  enterClass: makeStringProp(""),
+  /**
+   * 进入过渡的激活状态
+   * 类型：string
+   */
+  enterActiveClass: makeStringProp(""),
+  /**
+   * 进入过渡的结束状态
+   * 类型：string
+   */
+  enterToClass: makeStringProp(""),
+  /**
+   * 离开过渡的开始状态
+   * 类型：string
+   */
+  leaveClass: makeStringProp(""),
+  /**
+   * 离开过渡的激活状态
+   * 类型：string
+   */
+  leaveActiveClass: makeStringProp(""),
+  /**
+   * 离开过渡的结束状态
+   * 类型：string
+   */
+  leaveToClass: makeStringProp(""),
+  /**
+   * 是否阻止触摸滚动
+   * 类型：boolean
+   * 默认值：false
+   */
+  disableTouchMove: makeBooleanProp(false)
+};
+exports.AbortablePromise = AbortablePromise;
 exports._export_sfc = _export_sfc;
 exports.addUnit = addUnit;
 exports.buttonProps = buttonProps;
@@ -8339,6 +8563,8 @@ exports.iconProps = iconProps;
 exports.index = index;
 exports.isDef = isDef;
 exports.isFunction = isFunction;
+exports.isObj = isObj;
+exports.isPromise = isPromise;
 exports.n = n;
 exports.o = o;
 exports.objToStyle = objToStyle;
@@ -8349,11 +8575,15 @@ exports.onLoad = onLoad;
 exports.onMounted = onMounted;
 exports.onShow = onShow;
 exports.onUnmounted = onUnmounted;
+exports.overlayProps = overlayProps;
 exports.p = p;
+exports.pause = pause;
+exports.popupProps = popupProps;
 exports.ref = ref;
 exports.resolveComponent = resolveComponent;
 exports.s = s;
 exports.switchProps = switchProps;
 exports.t = t;
+exports.transitionProps = transitionProps;
 exports.unref = unref;
 exports.watch = watch;

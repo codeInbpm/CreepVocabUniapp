@@ -6,6 +6,7 @@ const api_user = require("./api/user.js");
 const store_index = require("./store/index.js");
 if (!Math) {
   "./pages/login/login.js";
+  "./pages/login/bind-phone.js";
   "./pages/home/home.js";
   "./pages/battle/battle.js";
   "./pages/match/match.js";

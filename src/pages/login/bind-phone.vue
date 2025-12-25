@@ -9,7 +9,6 @@
       </view>
     </view>
 
-    <view class="footer">
       <button 
         class="bind-btn" 
         open-type="getPhoneNumber" 
@@ -18,6 +17,14 @@
       >
         一键绑定手机号
       </button>
+      
+      <button 
+        class="switch-btn" 
+        @click="handleLogout"
+      >
+        切换账号 / 返回登录
+      </button>
+
       <view class="tips">为了您的账号安全，请完成手机号验证</view>
     </view>
   </view>
@@ -67,6 +74,13 @@ const handleBindPhone = (e: any) => {
     // User denied
     uni.showToast({ title: '请授权手机号以继续', icon: 'none' })
   }
+}
+
+const handleLogout = () => {
+  userStore.clearToken()
+  userStore.clearUserInfo()
+  // Navigate back to login
+  uni.reLaunch({ url: '/pages/login/login' })
 }
 </script>
 
@@ -142,6 +156,18 @@ const handleBindPhone = (e: any) => {
     margin-top: 30rpx;
     color: #999;
     font-size: 24rpx;
+  }
+  
+  .switch-btn {
+      margin-top: 30rpx;
+      background-color: #f5f5f5;
+      color: #666;
+      border-radius: 50rpx;
+      font-size: 28rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      border: none;
+      &::after { border: none; }
   }
 }
 </style>

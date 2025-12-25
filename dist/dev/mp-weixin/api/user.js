@@ -6,4 +6,11 @@ function getUserProfile() {
     method: "GET"
   });
 }
+function rewardHintCards() {
+  return utils_request.request({
+    url: "/user/reward/hint",
+    method: "POST"
+  });
+}
 exports.getUserProfile = getUserProfile;
+exports.rewardHintCards = rewardHintCards;

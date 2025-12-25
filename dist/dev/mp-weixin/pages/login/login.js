@@ -16,57 +16,56 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     const userStore = store_user.useUserStore();
     const isLoggingIn = common_vendor.ref(false);
-    const handleWxLogin = () => {
+    const handleWxPhoneLogin = (e) => {
       if (isLoggingIn.value)
         return;
       isLoggingIn.value = true;
       common_vendor.index.showLoading({ title: "登录中..." });
+      if (e.detail.errMsg !== "getPhoneNumber:ok") {
+        common_vendor.index.hideLoading();
+        isLoggingIn.value = false;
+        common_vendor.index.showToast({ title: "需授权手机号才能登录", icon: "none" });
+        return;
+      }
       common_vendor.index.login({
         provider: "weixin",
         success: (loginRes) => {
           utils_request.request({
-            url: "/auth/wx-login",
+            url: "/auth/wx-login-phone",
             method: "POST",
             withoutToken: true,
             data: {
-              code: loginRes.code
+              code: loginRes.code,
+              encryptedData: e.detail.encryptedData,
+              iv: e.detail.iv
             }
           }).then((res) => {
             common_vendor.index.hideLoading();
-            console.log("Login Success:", res);
             const loginData = res.data;
             if (loginData && loginData.token) {
               const { token, userInfo } = loginData;
               userStore.saveToken(token);
               userStore.saveUserInfo(userInfo);
-              if (userInfo.needBindPhone) {
-                common_vendor.index.showToast({ title: "请绑定手机号", icon: "none" });
-                setTimeout(() => {
-                  common_vendor.index.navigateTo({ url: "/pages/login/bind-phone" });
-                }, 1e3);
-              } else {
-                const msg = userInfo.isNewUser ? "欢迎新用户！" : "欢迎回来！";
-                common_vendor.index.showToast({ title: msg, icon: "success" });
-                setTimeout(() => {
-                  common_vendor.index.switchTab({ url: "/pages/home/home" });
-                }, 1e3);
-              }
+              common_vendor.index.showToast({
+                title: userInfo.isNewUser ? "欢迎新用户！" : "欢迎回来！",
+                icon: "success"
+              });
+              setTimeout(() => {
+                common_vendor.index.switchTab({ url: "/pages/home/home" });
+              }, 1e3);
             } else {
-              console.error("Login Data Error:", res);
-              common_vendor.index.showToast({ title: "登录返回数据异常", icon: "none" });
+              common_vendor.index.showToast({ title: "登录数据异常", icon: "none" });
               isLoggingIn.value = false;
             }
           }).catch((err) => {
             common_vendor.index.hideLoading();
             isLoggingIn.value = false;
-            console.error("Login Failed:", err);
             common_vendor.index.showToast({ title: "登录失败: " + (err.msg || "网络错误"), icon: "none" });
           });
         },
-        fail: (err) => {
+        fail: () => {
           common_vendor.index.hideLoading();
           isLoggingIn.value = false;
-          console.error("uni.login failed:", err);
           common_vendor.index.showToast({ title: "微信登录失败", icon: "none" });
         }
       });
@@ -77,13 +76,8 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     return (_ctx, _cache) => {
       return {
         a: common_assets._imports_0,
-        b: common_vendor.o(handleWxLogin),
-        c: common_vendor.p({
-          type: "primary",
-          size: "large",
-          ["custom-class"]: "login-btn wx-btn",
-          loading: isLoggingIn.value
-        }),
+        b: common_vendor.o(handleWxPhoneLogin),
+        c: isLoggingIn.value,
         d: common_vendor.o(handleGuestLogin),
         e: common_vendor.p({
           type: "info",

@@ -14,8 +14,10 @@ interface UserState {
         level?: number;
         wordPower?: number;
         winCount?: number;
+        winCount?: number;
         totalBattles?: number;
         isNewUser?: boolean;
+        hintCards?: number;
     };
 }
 

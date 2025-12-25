@@ -12,20 +12,20 @@
 
     <!-- Bottom Section: Buttons -->
     <view class="footer">
-      <wd-button 
-        type="primary" 
-        size="large" 
-        custom-class="login-btn wx-btn" 
-        :loading="isLoggingIn"
-        @click="handleWxLogin"
+      <!-- 替换原来的 wd-button 为原生 button（wd-button 可能不支持 open-type） -->
+      <button
+          class="login-btn wx-btn"
+          open-type="getPhoneNumber"
+          @getphonenumber="handleWxPhoneLogin"
+          :loading="isLoggingIn"
       >
-        微信一键登录
-      </wd-button>
-      
+        微信一键登录（含手机号授权）
+      </button>
+
       <wd-button type="info" plain size="large" custom-class="login-btn guest-btn" @click="handleGuestLogin">
         游客快速开始
       </wd-button>
-      
+
       <view class="agreement">
         登录即代表同意 <text class="link">《用户协议》</text> 和 <text class="link">《隐私政策》</text>
       </view>
@@ -41,76 +41,63 @@ import request from '@/utils/request'
 const userStore = useUserStore()
 const isLoggingIn = ref(false)
 
-const handleWxLogin = () => {
+// 新增这个方法，替换原来的 handleWxLogin
+const handleWxPhoneLogin = (e: any) => {
   if (isLoggingIn.value) return
   isLoggingIn.value = true
-  
   uni.showLoading({ title: '登录中...' })
-  
-  // 1. Get WeChat Code
+
+  if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+    uni.hideLoading()
+    isLoggingIn.value = false
+    uni.showToast({ title: '需授权手机号才能登录', icon: 'none' })
+    return
+  }
+
+  // 先获取登录 code（必须，先调用 uni.login）
   uni.login({
     provider: 'weixin',
     success: (loginRes) => {
-      // 2. Call Backend
-      // Note: We use /auth/wx-login. Since context-path is /api and VITE_BASE_URL has /api,
-      // request.ts usually prepends BASE_URL.
-      // If VITE_BASE_URL = http://localhost:5687/api
-      // Then url = http://localhost:5687/api/auth/wx-login
-      // This matches the backend: context-path=/api + controller=/auth/wx-login
+      // 调用你已有的 /wx-login-phone 接口（它支持 code + encryptedData + iv）
       request({
-        url: '/auth/wx-login',
+        url: '/auth/wx-login-phone',
         method: 'POST',
         withoutToken: true,
         data: {
-          code: loginRes.code
+          code: loginRes.code,
+          encryptedData: e.detail.encryptedData,
+          iv: e.detail.iv
         }
       }).then((res: any) => {
         uni.hideLoading()
-        console.log('Login Success:', res)
-        
-        // 3. Save Data
-        // Backend returns Result<LoginVO> -> { code: 200, data: { token, userInfo } }
-        // request.ts returns res.data (the body), so res = { code: 200, data: { ... } }
-        
-        // Access token from res.data.token
-        const loginData = res.data;
-        
-        if (loginData && loginData.token) {
-            const { token, userInfo } = loginData
-            userStore.saveToken(token)
-            userStore.saveUserInfo(userInfo)
-            
-            if (userInfo.needBindPhone) {
-                uni.showToast({ title: '请绑定手机号', icon: 'none' })
-                setTimeout(() => {
-                    uni.navigateTo({ url: '/pages/login/bind-phone' })
-                }, 1000)
-            } else {
-                const msg = userInfo.isNewUser ? '欢迎新用户！' : '欢迎回来！'
-                uni.showToast({ title: msg, icon: 'success' })
-                
-                // 4. Navigate
-                setTimeout(() => {
-                  uni.switchTab({ url: '/pages/home/home' })
-                }, 1000)
-            }
-        } else {
-             console.error('Login Data Error:', res);
-             uni.showToast({ title: '登录返回数据异常', icon: 'none' })
-             isLoggingIn.value = false
-        }
+        const loginData = res.data // { token, userInfo }
 
+        if (loginData && loginData.token) {
+          const { token, userInfo } = loginData
+          userStore.saveToken(token)
+          userStore.saveUserInfo(userInfo)
+
+          // 这里手机号已绑定，无需 needBindPhone 判断
+          uni.showToast({
+            title: userInfo.isNewUser ? '欢迎新用户！' : '欢迎回来！',
+            icon: 'success'
+          })
+          setTimeout(() => {
+            uni.switchTab({ url: '/pages/home/home' })
+          }, 1000)
+        } else {
+          uni.showToast({ title: '登录数据异常', icon: 'none' })
+          isLoggingIn.value = false
+        }
       }).catch(err => {
         uni.hideLoading()
         isLoggingIn.value = false
-        console.error('Login Failed:', err)
         uni.showToast({ title: '登录失败: ' + (err.msg || '网络错误'), icon: 'none' })
       })
     },
-    fail: (err) => {
+    fail: () => {
       uni.hideLoading()
       isLoggingIn.value = false
-      console.error('uni.login failed:', err)
       uni.showToast({ title: '微信登录失败', icon: 'none' })
     }
   })
@@ -179,7 +166,7 @@ const handleGuestLogin = () => {
   padding: 40rpx 60rpx;
   background-color: #fff;
   padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
-  
+
   .login-btn {
     margin-bottom: 30rpx !important;
     border-radius: 50rpx !important;
@@ -188,13 +175,13 @@ const handleGuestLogin = () => {
     height: 90rpx !important;
     line-height: 90rpx !important;
   }
-  
+
   .wx-btn {
     background-color: #0062ff !important; // Luckin Blue
     border-color: #0062ff !important;
     color: #fff !important;
   }
-  
+
   .guest-btn {
     color: #999 !important;
     border-color: #eee !important;
@@ -206,7 +193,7 @@ const handleGuestLogin = () => {
     justify-content: center;
     font-size: 24rpx;
     color: #999;
-    
+
     .link {
       color: #0062ff;
     }
